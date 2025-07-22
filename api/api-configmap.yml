@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-configmap
+  namespace: prd-teste
+data:
+  Mongo_DataBase: admin
+  Mongo_Host: mongo-service
+  Mongo_Port: "27017"

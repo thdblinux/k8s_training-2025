@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-blue
+  namespace: prd-teste
+  labels:
+    app: nginx
+    versao: blue
+spec:
+  containers:
+  - name: nginx
+    image: kubedevio/nginx-color:blue

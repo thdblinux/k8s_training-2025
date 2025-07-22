@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-green
+  namespace: prd-teste
+  labels:
+    app: nginx
+    versao: green
+spec:
+  containers:
+  - name: nginx
+    image: kubedevio/nginx-color:green
