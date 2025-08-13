@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim 
+metadata:
+  name: scw-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: scw-bssd-retain
+  resources:
+    requests:
+      storage: 5Gi

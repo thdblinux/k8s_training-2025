@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      initContainers:
+          - name: init-pod
+            image: busybox:1.28
+            command: ["sh", "-c", "until nslookup mongo-service.default.svc.cluster.local; do echo Aguardando o Banco de Dados; sleep 2; done; "]
+      containers:
+        - name: api
+          image: fabricioveronez/pedelogo-catalogo:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /read
+              port: 80
+              scheme: HTTP
+            timeoutSeconds: 1
+            failureThreshold: 3
+            periodSeconds: 5
+          startupProbe: 
+            httpGet:
+              path: /health
+              port: 80
+              scheme: HTTP
+            failureThreshold: 30
+            periodSeconds: 10  
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+              scheme: HTTP
+            timeoutSeconds: 1
+            failureThreshold: 3
+            periodSeconds: 5
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 443
+              name: https
+          envFrom:
+          - configMapRef:
+              name: api-configmap
+          env:
+            - name: Mongo_User
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO_INITDB_ROOT_USERNAME
+                  name: mongodb-secret
+            - name: Mongo_Password
+              valueFrom:
+                secretKeyRef:
+                  key: MONGO_INITDB_ROOT_PASSWORD
+                  name: mongodb-secret
